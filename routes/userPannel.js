@@ -1,5 +1,5 @@
 const response = require('./responseHandler');
-var sanitizer = require('sanitize')();
+const util = require('./util')
 
 
 const enquireNow = async (req, res) => {
@@ -50,7 +50,29 @@ const fetchEnquiry = async (req, res) => {
 	}
 
 }
+
+
+const signup = async (req, res) => {
+	try{
+		reqData = req.body
+
+		let name = reqData.name
+		let email = reqData.email
+		let password = reqData.password
+
+		util.commonObj.checkIfPresent(name,email,password)
+		util.signup(res=res,name=name,email=email,password=password)
+
+		res.send(new response.SUCCESS(true, null, 'sucessfully added').response);
+
+	}catch(err){
+		console.log(err)
+        res.status(400).send(new response.BAD_REQUEST(false, err, "Failed").response);
+	}
+} 
+
 module.exports = {
+	signup,
     enquireNow,
     fetchEnquiry
 }

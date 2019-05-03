@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const home = require('./home');
-const enquire = require('./enquire');
+const userPannel = require('./userPannel');
 
 
 // Home video
@@ -60,8 +60,11 @@ router.delete('/tours', home.deleteTours);
 router.delete('/packages', home.deletePackages);
 
 // enquire 
+router.post('/enquire', userPannel.enquireNow);
+router.get('/enquire', userPannel.fetchEnquiry);
 
-router.post('/enquire', enquire.enquireNow);
-router.get('/enquire', enquire.fetchEnquiry);
+//userModule
+router.post('/signup',userPannel.signup);
+
 
 module.exports = router;
