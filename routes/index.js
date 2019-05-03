@@ -62,5 +62,6 @@ router.delete('/packages', home.deletePackages);
 // enquire 
 
 router.post('/enquire', enquire.enquireNow);
+router.get('/enquire', enquire.fetchEnquiry);
 
 module.exports = router;
