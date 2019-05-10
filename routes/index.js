@@ -65,6 +65,6 @@ router.get('/enquire', userPannel.fetchEnquiry);
 
 //userModule
 router.post('/signup',userPannel.signup);
-
+router.post('/login',userPannel.login);
 
 module.exports = router;

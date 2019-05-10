@@ -7,12 +7,15 @@ var cryptoJS = require("crypto-js");
 
 
 
-function signup(name,email,password){
+function signup(res,req,name,email,password){
     try{
-        console.log('inside signu')
+        console.log('inside signup')
         db.collection('user_master').find({'email':email}).toArray((err,data) =>{
-            if (err) throw "database fetch error"
+            if (err) res.status(400).send(new response.BAD_REQUEST(false, err, "db fetch error").response);
+            console.log(data)
+            console.log(data.length)
             if (data.length == 0){
+                console.log('inside length ==0 ')
                 var password =  cryptoJS.SHA256(password)
                 password = cryptoJS.enc.Base64.stringify(password)
     
@@ -22,13 +25,14 @@ function signup(name,email,password){
                     'password': password
                 }
                 db.collection('user_master').insertOne(user_data, (err, result) => {
-                    if (err) throw "database insertion error"
+                    if (err) res.status(400).send(new response.BAD_REQUEST(false, err, "db insertion error").response);
                 });
             }
     
-            if(data.lenght >0 ){
+            if (data.length > 0){
+                console.log('inside length >0 ')
                 console.log('user exist')
-                throw "user_exist"
+                res.send(new response.SUCCESS(true, null, 'user exist').response);
             } 
         });
     }catch (err){
