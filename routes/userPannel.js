@@ -15,8 +15,11 @@ const login = async (req,res) => {
 	
 		db.collection('user_master').find({'email':email, 'password': password}).toArray((err,data) => {
 			if (err) return res.status(400).send(new response.BAD_REQUEST(false, err, "db fetch error").response);
-			if (data.length >=0 ){
+			if (data.length >0 ){
 				return res.send(new response.SUCCESS(true, null, 'user login sucess').response);
+			}else{
+				res.status(400).send(new response.BAD_REQUEST(false, null, "invalid login").response);
+
 			}
 		});
 	}catch(err){
@@ -119,11 +122,59 @@ const fetchEnquiry = async (req, res) => {
 }
 
 
+const addReview =  async (req, res) => {
+	try{
+		const post_data = req.body
 
+		let name = post_data.name		
+		let email = post_data.email
+		let activity = post_data.activity
+		let review = post_data.review
+		let stars = post_data.stars
+
+		// util.commonObj.checkIfPresent(res,name,email,activity,review,stars)
+
+		let insert_params = {
+			name,
+			email,
+			activity,
+			review,
+			stars
+		}
+
+		db.collection('reviews').insertOne(insert_params, (err,data) =>{
+			if (err) res.status(400).send(new response.BAD_REQUEST(false, err, "Some error occored").response);
+			return res.send(new response.SUCCESS(true, null, "SUCCESS").response)
+		});
+		
+		
+	}catch (err){
+		console.log(err)
+		res.status(400).send(new response.BAD_REQUEST(false, err, "Failed").response);
+	}
+}
+
+
+const getReviews = async(req,res) => {
+	try{
+		db.collection('reviews').find({}).toArray((err,data) =>{
+			if (err) res.status(400).send(new response.BAD_REQUEST(false, err, "Failed").response);
+			if(data.length > 0){
+				console.log('fetching data')
+				res.send(new response.SUCCESS(true, data, "SUCCESS").response)
+			}
+		});
+	}catch(err){
+		console.log(err)
+		res.status(400).send(new response.BAD_REQUEST(false, err, "Failed").response);
+	}
+}
 
 module.exports = {
 	signup,
 	login,
 	enquireNow,
-	fetchEnquiry
+	fetchEnquiry,
+	addReview,
+	getReviews
 }
