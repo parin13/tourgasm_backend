@@ -1052,8 +1052,8 @@ const deletePackages = async (req, res) => {
     try {
         db.collection("packages").find({
             id: req.query.id
-        }).toArray((err, result_event) => {
-            if (result_event.length > 0) {
+        }).toArray((err, result) => {
+            if (result.length > 0) {
                 if (fs.existsSync(`public/${result[0].path}/${result[0].fileName}`)) {
                     fs.unlinkSync(`public/${result[0].path}/${result[0].fileName}`);
                 }
