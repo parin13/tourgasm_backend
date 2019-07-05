@@ -1,6 +1,8 @@
 const response = require('./responseHandler');
 const util = require('./util')
 var cryptoJS = require("crypto-js");
+const bcrypt = require('bcrypt');
+
 
 
 const login = async (req,res) => {
@@ -9,18 +11,22 @@ const login = async (req,res) => {
 	
 		let email = reqData.email;
 		var password = reqData.password;
-		
-		password = cryptoJS.SHA256(password)
-		password = cryptoJS.enc.Base64.stringify(password)
-	
-		db.collection('user_master').find({'email':email, 'password': password}).toArray((err,data) => {
-			if (err) return res.status(400).send(new response.BAD_REQUEST(false, err, "db fetch error").response);
-			if (data.length >0 ){
-				return res.send(new response.SUCCESS(true, null, 'user login sucess').response);
-			}else{
-				res.status(400).send(new response.BAD_REQUEST(false, null, "invalid login").response);
 
-			}
+		
+
+
+		db.collection('user_master').findOne({'email':email},(err,data) => {
+			if (err) return res.status(400).send(new response.BAD_REQUEST(false, err, "db fetch error").response);
+			if (data != null){
+				hash = data.password;
+				
+				bcrypt.compare(password, hash, (err, isPasswordMatch) => {
+				if (isPasswordMatch){
+					return res.send(new response.SUCCESS(true, null, 'user login sucess').response);		
+				}})   
+			}else{
+				res.status(400).send(new response.BAD_REQUEST(false, null, "no data found").response);
+			}			
 		});
 	}catch(err){
 		console.log(err)
@@ -36,32 +42,35 @@ const signup = async (req, res) => {
 		let name = reqData.name
 		let email = reqData.email
 		let password = reqData.password
+		console.log(password)
 
 		util.commonObj.checkIfPresent(name, email, password)
-		// await util.signup(res,res,name,email,password)
 
 		db.collection('user_master').find({ 'email': email }).toArray((err, data) => {
 			if (err) res.status(400).send(new response.BAD_REQUEST(false, err, "db fetch error").response);
-			console.log(data)
-			console.log(data.length)
-			if (data.length == 0) {
-				console.log('inside length ==0 ')
-				var password = cryptoJS.SHA256(password)
-				password = cryptoJS.enc.Base64.stringify(password)
 
-				let user_data = {
-					name : name,
-					email: email,
-					password: password
-				}
-				db.collection('user_master').insertOne(user_data, (err, result) => {
-					if (err) res.status(400).send(new response.BAD_REQUEST(false, err, "db insertion error").response);
-				});
+			if (data.length == 0) {
+				
+				bcrypt.genSalt(13,(err,salt) => {
+					if (err) res.status(400).send(new response.BAD_REQUEST(false, err, "error").response);
+
+					bcrypt.hash(password,salt,(err,hash) => {
+						if (err) res.status(400).send(new response.BAD_REQUEST(false, err, "error").response);					
+						password = hash;
+						let user_data = {
+							name : name,
+							email: email,
+							password: password
+						}
+						db.collection('user_master').insertOne(user_data, (err, result) => {
+							if (err) res.status(400).send(new response.BAD_REQUEST(false, err, "db insertion error").response);
+						});
+					})
+				})
+
 			}
 
 			if (data.length > 0) {
-				console.log('inside length >0 ')
-				console.log('user exist')
 				return res.send(new response.SUCCESS(true, null, 'user exist').response);
 			}
 			res.send(new response.SUCCESS(true, null, 'sucessfully added').response);
@@ -71,6 +80,7 @@ const signup = async (req, res) => {
 		res.status(400).send(new response.BAD_REQUEST(false, err, "Failed").response);
 	}
 }
+
 
 const enquireNow = async (req, res) => {
 	try {

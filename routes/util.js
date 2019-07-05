@@ -7,6 +7,8 @@ var cryptoJS = require("crypto-js");
 
 
 
+
+
 function signup(res,req,name,email,password){
     try{
         console.log('inside signup')
