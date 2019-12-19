@@ -1078,16 +1078,21 @@ module.exports = {
     getHomeMainSlideShow,
     setHomeMainSlideShow,
     updateHomeMainSlideShow,
+
     getSingleEvent,
     getAllEvents,
     setEvents,
     updateEvents,
+    getPopularEvents,
+    setPopularEvents,
+    getFeaturedEvents,
+    deleteEvents,
+
     getSinglePackage,
     getAllPackages,
     setPackages,
     updatePackages,
-    getPopularEvents,
-    setPopularEvents,
+
     getSingleTour,
     getAllTours,
     setTours,
@@ -1098,10 +1103,11 @@ module.exports = {
     updateTourPackages,
     getPopularTours,
     setPopularTours,
-    getFeaturedEvents,
+    deleteTours,
+
     getPopularTreks,
     getAllTreks,
     deletePackages,
-    deleteTours,
-    deleteEvents
+
+
 }

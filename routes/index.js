@@ -7,6 +7,9 @@
         const userRouter = require('../lib/modules/user-profile/user-profile.route');
         app.use(`${baseApi}/user`, userRouter);
 
+        const homeRouter = require('../lib/modules/home/home.route');
+        app.use(`${baseApi}/home`, homeRouter);
+
     };
 
 })(module.exports);
