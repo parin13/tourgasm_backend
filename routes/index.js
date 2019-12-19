@@ -5,7 +5,7 @@
         const baseApi = "/api";
 
         const userRouter = require('../lib/modules/user-profile/user-profile.route');
-        app.use(`${baseApi}/user`,userRouter);
+        app.use(`${baseApi}/user`, userRouter);
 
     };
 

@@ -6,31 +6,50 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
+const expressValidator = require('express-validator');
+const cors = require('cors');
 
-const router  = require('./routes/index');
-
-const mongo = require('./config/mongodb');
 
 var app = express();
+// app.use(expressValidator());
 
-const connectToDb = async () => {
-  global.db = await mongo.mongoConnect();
+const dotenv = require('dotenv').config({ path: path.join(__dirname, '/.env') });
+if (dotenv.error) {
+    console.log('=---dotenv.error---=', dotenv.error);
+    throw dotenv.error;
 }
 
-connectToDb();
+app.use(cors());
+app.options('*', cors());
+ 
+const dbConnector = require('./lib/helpers/database.helper')
+const logModule = require('./lib/common/logger/common-helper.logger');
+const router  = require('./routes/index');
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
-
+dbConnector.init(app); 
+logModule.init(app);
+ 
+  /* service middleware */
+ app.use( (req, res, next) => {
+   if(app.locals.db){
+     req.db = app.locals.db;
+   }
+   if(app.locals.logger){
+     req.logger = app.locals.logger;
+   }
+   console.log('==============service initialise done=========');
+ 
+   next();
+ });
+ 
 app.use(logger('dev'));
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,DELETE");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   // res.header('Content-Type', 'application/json');
-  req.setTimeout(0);
   next();
 });
 
@@ -41,16 +60,16 @@ app.use(bodyParser.json({
   }
 }))
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+// app.use(cookieParser());]''
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
 
-router.init(app);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+ /* map router */
+ router.init(app);
+ app.get('/', (req, res, next) => {
+   console.log(req.env);
+   res.send('Tourgasm Backend Application Running')
+ });
 
 // error handler
 app.use(function(err, req, res, next) {
