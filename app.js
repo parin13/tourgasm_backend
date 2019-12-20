@@ -6,12 +6,17 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
-const expressValidator = require('express-validator');
+// const expressValidator = require('express-validator');
+// const fileUpload = require('express-formidable');
+
 const cors = require('cors');
 
 
 var app = express();
 // app.use(expressValidator());
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
 
 const dotenv = require('dotenv').config({ path: path.join(__dirname, '/.env') });
 if (dotenv.error) {
@@ -60,7 +65,6 @@ app.use(bodyParser.json({
   }
 }))
 app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(cookieParser());]''
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
 
