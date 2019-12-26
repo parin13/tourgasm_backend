@@ -10,10 +10,9 @@ const fileUpload = require('express-fileupload');
 // const fileUpload = require('express-formidable');
 
 const cors = require('cors');
-
-
 var app = express();
 // app.use(expressValidator());
+
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -29,7 +28,9 @@ app.options('*', cors());
  
 const dbConnector = require('./lib/helpers/database.helper')
 const logModule = require('./lib/common/logger/common-helper.logger');
-const router  = require('./routes/index');
+const router  = require('./routes/newIndex');
+var indexRouter = require('./routes/oldIndex');
+
 
 dbConnector.init(app); 
 logModule.init(app);
@@ -70,6 +71,7 @@ app.use(fileUpload());
 
  /* map router */
  router.init(app);
+//  app.use('/', indexRouter);
  app.get('/', (req, res, next) => {
    console.log(req.env);
    res.send('Tourgasm Backend Application Running')

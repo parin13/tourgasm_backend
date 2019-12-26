@@ -1,5 +1,4 @@
 const response = require('./responseHandler');
-const util = require('./util');
 const cryptoJS = require("crypto-js");
 const bcrypt = require('bcrypt');
 
